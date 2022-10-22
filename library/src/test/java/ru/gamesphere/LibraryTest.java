@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
 import ru.gamesphere.factories.FileBookFactory;
 import ru.gamesphere.factories.LibraryFactory;
 
@@ -34,7 +35,7 @@ class LibraryTest extends AbstractTest {
 
 
     @Test
-    void createLibraryWrongCapacityTest() {
+    void illegalArgumentExceptionIsThrownIfCallingInvalidIndex() {
         assertThrows(IllegalArgumentException.class, () -> libraryFactory.library(0));
         assertThrows(IllegalArgumentException.class, () -> libraryFactory.library(1));
         assertThrows(IllegalArgumentException.class, () -> libraryFactory.library(99));
@@ -42,7 +43,7 @@ class LibraryTest extends AbstractTest {
     }
 
     @Test
-    void createLibraryCorrectCapacityTest() {
+    void noExceptionIsThrownIfCallingValidIndex() {
         assertDoesNotThrow(() -> libraryFactory.library(100));
         assertDoesNotThrow(() -> libraryFactory.library(101));
         assertDoesNotThrow(() -> libraryFactory.library(10000));
@@ -127,11 +128,13 @@ class LibraryTest extends AbstractTest {
     @Test
     void addBookNoSpaceTest() {
         Library library = libraryFactory.library(100);
-        assertThrows(IllegalStateException.class, () -> library.addBook(new Book("", new Author(""))));
+        Book mockBook = Mockito.mock(Book.class);
+
+        assertThrows(IllegalStateException.class, () -> library.addBook(mockBook));
     }
 
     @Test
-    void printAlBooksTest() {
+    void printAllBooksTest() {
         libraryFactory.library(100).printAllBooks();
         assertEquals(gson.toJson(fileBookFactory.books()), outputStream.toString().trim());
     }
