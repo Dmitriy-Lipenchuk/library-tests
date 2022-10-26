@@ -7,12 +7,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
+import ru.gamesphere.factories.BooksFactory;
 import ru.gamesphere.factories.FileBookFactory;
 import ru.gamesphere.factories.LibraryFactory;
 
 import javax.inject.Inject;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -137,5 +139,23 @@ class LibraryTest extends AbstractTest {
     void printAllBooksTest() {
         libraryFactory.library(100).printAllBooks();
         assertEquals(gson.toJson(fileBookFactory.books()), outputStream.toString().trim());
+    }
+
+    @Test
+    void printAllBooksMockitoWhenTest() {
+        BooksFactory bookFactory = Mockito.mock(BooksFactory.class);
+        Mockito.when(bookFactory.books()).thenReturn(
+                List.of(
+                        new Book("Master i Margarita", new Author("Bulgakov")),
+                        new Book("Voina i mir", new Author("Tolstoy")),
+                        new Book("Gore ot uma", new Author("Griboedov"))
+                )
+        );
+
+        Library library = new Library(3, bookFactory, gson);
+
+        library.printAllBooks();
+
+        assertEquals(gson.toJson(bookFactory.books()), outputStream.toString().trim());
     }
 }
